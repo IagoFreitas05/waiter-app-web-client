@@ -6,13 +6,14 @@ export const Board = styled.div`
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: center;
     flex: 1;
-
-    header {
+   > header {
         padding: 8px;
         font-size: 14px;
         display:flex;
         align-items: center;
+        justify-content: center;
         gap: 8px;
     }
 `;

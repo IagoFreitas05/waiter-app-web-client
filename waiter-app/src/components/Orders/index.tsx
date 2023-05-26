@@ -1,6 +1,6 @@
 import { Order } from "../../types/Order";
 import { OrdersBoard } from "../OrdersBoard";
-import { Container, Board, OrdersContainer } from "./styles"
+import { Container } from "./styles"
 
 const orders: Order[] = [
     {
