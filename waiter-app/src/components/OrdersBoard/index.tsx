@@ -10,9 +10,10 @@ interface OrdersBoardProps {
     title: string;
     orders: Order[];
     onCancelOrder: (orderId: string) => void;
+    onChangeOrderStatus: (orderId: string, status: Order["status"]) =>  void;
 }
 
-export function OrdersBoard({icon, title, orders, onCancelOrder}: OrdersBoardProps) {
+export function OrdersBoard({icon, title, orders, onCancelOrder, onChangeOrderStatus}: OrdersBoardProps) {
     const [isModalVisibile, setIsModalVisible] = useState(false);
     const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
     const [isLoading, setIsLoading] = useState(false);
@@ -38,9 +39,24 @@ export function OrdersBoard({icon, title, orders, onCancelOrder}: OrdersBoardPro
         setIsModalVisible(false);
     }
 
+    async function handleChangeOrderStatus(){
+        if(!selectedOrder){
+            return null;
+        }
+        const status = selectedOrder.status === "WAITING" ? "IN_PRODUCTION" : "DONE";
+        setIsLoading(true);
+
+        await api.patch(`/orders/${selectedOrder._id}`, {status});
+        toast.success(`O pedido da mesa ${selectedOrder.table} teve o status alterado`);
+        onChangeOrderStatus(selectedOrder._id, status);
+        setIsLoading(false);
+        setIsModalVisible(false);
+    }
+
     return (
         <Board>
             <OrderModal
+                onChangeOrderStatus={handleChangeOrderStatus}
                 onCancelOrder={handleCancelOrder}
                 visible={isModalVisibile}
                 order={selectedOrder}
@@ -55,7 +71,10 @@ export function OrdersBoard({icon, title, orders, onCancelOrder}: OrdersBoardPro
             {orders.length > 0 && (
                 <OrdersContainer>
                     {orders.map((order) => (
-                        <button type="button" key={order._id} onClick={() => handleOpenModal(order)}>
+                        <button
+                            type="button"
+                            key={order._id}
+                            onClick={() => handleOpenModal(order)}>
                             <strong>Mesa {order.table}</strong>
                             <span>{order.products.length} itens</span>
                         </button>

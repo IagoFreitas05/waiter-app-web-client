@@ -1,38 +1,41 @@
-import { useEffect } from "react";
-import closeIcon from "../../assets/images/close-icon.svg";
-import { Order } from "../../types/Order";
-import { formatCurrency } from "../../utils/formatCurrency";
-import { ModalBody, OrderDetails, Overlay , Actions} from "./styles";
+import {useEffect} from 'react';
+import closeIcon from '../../assets/images/close-icon.svg';
+import {Order} from '../../types/Order';
+import {formatCurrency} from '../../utils/formatCurrency';
+import {ModalBody, OrderDetails, Overlay, Actions} from './styles';
+
 interface OrderModalProps {
     visible: boolean;
     order: Order | null;
     onClose: () => void;
-    onCancelOrder: () => Promise<void>;
+    onCancelOrder: () => Promise<null | undefined>;
     isLoading: boolean;
+    onChangeOrderStatus: () => void;
+
 }
 
-export function OrderModal( {visible, order, onClose, onCancelOrder, isLoading}: OrderModalProps){
+export function OrderModal({visible, order, onClose, onCancelOrder, isLoading, onChangeOrderStatus}: OrderModalProps) {
 
-    useEffect( () => {
-        function handleKeyDown(event: KeyboardEvent){
-            if(event.key === "Escape"){
+    useEffect(() => {
+        function handleKeyDown(event: KeyboardEvent) {
+            if (event.key === 'Escape') {
                 onClose();
             }
         }
 
-        document.addEventListener("keydown", handleKeyDown);
+        document.addEventListener('keydown', handleKeyDown);
 
         return () => {
-            document.removeEventListener("keydown", handleKeyDown);
+            document.removeEventListener('keydown', handleKeyDown);
         };
 
     }, [onClose]);
 
-    if(!visible || !order){
+    if (!visible || !order) {
         return null;
     }
 
-    const total = order.products.reduce((total, {product, quantity })=> {
+    const total = order.products.reduce((total, {product, quantity}) => {
         return total + (product.price * quantity);
     }, 0);
 
@@ -42,7 +45,7 @@ export function OrderModal( {visible, order, onClose, onCancelOrder, isLoading}:
                 <header>
                     <strong>Mesa {order.table}</strong>
                     <button type="button" onClick={onClose}>
-                        <img src={closeIcon} alt="fechar modal" />
+                        <img src={closeIcon} alt="fechar modal"/>
                     </button>
                 </header>
 
@@ -50,14 +53,14 @@ export function OrderModal( {visible, order, onClose, onCancelOrder, isLoading}:
                     <small>Status do pedido</small>
                     <div>
                         <span>
-                            {order.status === "WAITING" && "🕓"}
-                            {order.status === "IN_PRODUCTION" && "👨🏻‍🍳"}
-                            {order.status === "DONE" && "✅"}
+                            {order.status === 'WAITING' && '🕓'}
+                            {order.status === 'IN_PRODUCTION' && '👨🏻‍🍳'}
+                            {order.status === 'DONE' && '✅'}
                         </span>
                         <strong>
-                            {order.status === "WAITING" && "Fila de espera"}
-                            {order.status === "IN_PRODUCTION" && "Em preparação"}
-                            {order.status === "DONE" && "Pronto!"}
+                            {order.status === 'WAITING' && 'Fila de espera'}
+                            {order.status === 'IN_PRODUCTION' && 'Em preparação'}
+                            {order.status === 'DONE' && 'Pronto!'}
                         </strong>
                     </div>
                 </div>
@@ -65,13 +68,13 @@ export function OrderModal( {visible, order, onClose, onCancelOrder, isLoading}:
                 <OrderDetails>
                     <strong>Itens</strong>
                     <div className="order-items">
-                        {order.products.map( ({_id, product, quantity}) => (
+                        {order.products.map(({_id, product, quantity}) => (
                             <div className="item" key={_id}>
                                 <img
-                                src={`http://localhost:3001/uploads/${product.imagePath}`}
-                                alt=""
-                                width="56"
-                                height="28.51"
+                                    src={`http://localhost:3001/uploads/${product.imagePath}`}
+                                    alt=""
+                                    width="56"
+                                    height="28.51"
                                 />
                                 <span className="quantity">{quantity}x</span>
                                 <div className="product-details">
@@ -87,13 +90,23 @@ export function OrderModal( {visible, order, onClose, onCancelOrder, isLoading}:
                     </div>
                 </OrderDetails>
                 <Actions>
-                    <button
-                        disabled={isLoading}
-                        type="button"
-                        className="primary">
-                        <span>👨🏻‍🍳</span>
-                        <strong>Iniciar produção</strong>
-                    </button>
+                    {order.status !== 'DONE' && (
+                        <button
+                            onClick={onChangeOrderStatus}
+                            disabled={isLoading}
+                            type="button"
+                            className="primary">
+                            <span>
+                                {order.status === "WAITING" && "👨🏻‍🍳"}
+                                {order.status === "IN_PRODUCTION" && "👨🏻‍🍳"}
+                            </span>
+                            <strong>
+                                {order.status === "WAITING" && "Iniciar produção"}
+                                {order.status === "IN_PRODUCTION" && "Concluir pedido"}
+                            </strong>
+                        </button>
+                    )}
+
                     <button
                         disabled={isLoading}
                         onClick={onCancelOrder}
