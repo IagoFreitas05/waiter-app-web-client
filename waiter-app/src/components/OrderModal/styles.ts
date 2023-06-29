@@ -117,6 +117,11 @@ export const Actions = styled.footer`
         gap: 8px;
     }
 
+    button:disabled{
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
     .secondary{
         padding: 14px 24px;
         color: #D73035;
