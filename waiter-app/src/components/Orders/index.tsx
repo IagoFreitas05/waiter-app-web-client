@@ -3,9 +3,22 @@ import {OrdersBoard} from '../OrdersBoard';
 import {Container} from './styles';
 import {useEffect, useState} from 'react';
 import {api} from '../../utils/api.ts';
-
+import socketIo from "socket.io-client";
+import {toast} from 'react-toastify';
 export function Orders() {
     const [orders, setOrders] = useState<Order[]>([]);
+
+    useEffect(() => {
+        const socket = socketIo("http://localhost:3001",{
+            transports:["websocket"],
+        });
+
+        socket.on("orders@new", (order : Order) => {
+            setOrders(prevState => prevState.concat(order));
+            toast.success(`Novo pedido na mesa ${order.table}`);
+        });
+
+    }, []);
 
     useEffect(() => {
         api.get('/orders').then(({data}) => {

@@ -98,7 +98,7 @@ export function OrderModal({visible, order, onClose, onCancelOrder, isLoading, o
                             className="primary">
                             <span>
                                 {order.status === "WAITING" && "👨🏻‍🍳"}
-                                {order.status === "IN_PRODUCTION" && "👨🏻‍🍳"}
+                                {order.status === "IN_PRODUCTION" && "✅"}
                             </span>
                             <strong>
                                 {order.status === "WAITING" && "Iniciar produção"}
